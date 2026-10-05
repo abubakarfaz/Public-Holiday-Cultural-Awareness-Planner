@@ -37,10 +37,11 @@ class TestHolidayAPIClient(unittest.TestCase):
         self.client = HolidayAPIClient()
 
     def test_get_holidays_returns_list(self) -> None:
-        """Check that a valid country/year returns Holiday objects."""
-        holidays = self.client.get_holidays(country_code="NG", year=2026)
-        self.assertGreater(len(holidays), 0)
-        self.assertIsInstance(holidays[0], Holiday )
+        """Check that valid countries/years return Holiday objects."""
+        for code in ["NG", "US", "GB"]:
+            holidays = self.client.get_holidays(country_code=code, year=2026)
+            self.assertGreater(len(holidays), 0)
+            self.assertIsInstance(obj=holidays[0], cls=Holiday)
 
     def test_get_holidays_invalid_code_raises_error(self) -> None:
         """Check that an invalid country code raises HolidayAPIError."""
