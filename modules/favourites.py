@@ -12,16 +12,19 @@ class FavouritesManager:
         self.fav_filepath = fav_filepath
         self.guides_filepath = guides_filepath
 
-        os.makedirs(os.path.dirname(self.fav_filepath), exist_ok=True)
-        os.makedirs(os.path.dirname(self.guides_filepath), exist_ok=True)
+        for filepath in (self.fav_filepath, self.guides_filepath):
+            directory = os.path.dirname(os.path.abspath(filepath))
+            if directory:
+                os.makedirs(directory, exist_ok=True)
 
     def _load_json(self, filepath: str) -> list:
         if not os.path.exists(filepath):
             return []
         try:
             with open(filepath, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
+                data = json.load(f)
+                return data if isinstance(data, list) else []
+        except (TypeError, ValueError, json.JSONDecodeError):
             return []
 
     def _save_json(self, filepath: str, data: list) -> None:
@@ -33,24 +36,24 @@ class FavouritesManager:
     ) -> bool:
         """Adds a country to favourites if not already present."""
         favs = self._load_json(self.fav_filepath)
-        code_upper = country_code.strip().upper()
+        code_upper = (country_code or "").strip().upper()
 
         for item in favs:
-            if item.get("code") == code_upper:
-                return False  # Duplicate found
+            if isinstance(item, dict) and item.get("code") == code_upper:
+                return False
 
-        favs.append({"code": code_upper, "name": country_name.strip()})
+        favs.append({"code": code_upper, "name": (country_name or "").strip()})
         self._save_json(self.fav_filepath, favs)
         return True
 
     def remove_favourite_country(self, country_code: str) -> bool:
         """Removes a country from favourites."""
         favs = self._load_json(self.fav_filepath)
-        code_upper = country_code.strip().upper()
-        filtered = [item for item in favs if item.get("code") != code_upper]
+        code_upper = (country_code or "").strip().upper()
+        filtered = [item for item in favs if not (isinstance(item, dict) and item.get("code") == code_upper)]
 
         if len(filtered) == len(favs):
-            return False  # Nothing removed
+            return False
 
         self._save_json(self.fav_filepath, filtered)
         return True
@@ -68,11 +71,11 @@ class FavouritesManager:
     ) -> bool:
         """Saves a full holiday guide so it can be reloaded offline without API calls."""
         guides = self._load_json(self.guides_filepath)
-        guide_id = f"{country_code.strip().upper()}_{year}"
+        guide_id = f"{(country_code or '').strip().upper()}_{year}"
 
         new_guide = {
             "guide_id": guide_id,
-            "country_code": country_code.strip().upper(),
+            "country_code": (country_code or '').strip().upper(),
             "year": year,
             "holidays": holidays,
             "ai_insights": ai_insights,
@@ -80,7 +83,7 @@ class FavouritesManager:
 
         updated = False
         for i, g in enumerate(guides):
-            if g.get("guide_id") == guide_id:
+            if isinstance(g, dict) and g.get("guide_id") == guide_id:
                 guides[i] = new_guide
                 updated = True
                 break
@@ -96,9 +99,9 @@ class FavouritesManager:
     ) -> Optional[Dict[str, Any]]:
         """Retrieves a saved guide to display without calling external APIs."""
         guides = self._load_json(self.guides_filepath)
-        guide_id = f"{country_code.strip().upper()}_{year}"
+        guide_id = f"{(country_code or '').strip().upper()}_{year}"
         for g in guides:
-            if g.get("guide_id") == guide_id:
+            if isinstance(g, dict) and g.get("guide_id") == guide_id:
                 return g
         return None
 

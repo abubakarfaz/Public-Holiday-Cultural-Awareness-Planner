@@ -77,3 +77,4 @@ class ComparisonModule:
             f"unique_to_{country1_code}": unique_country1,
             f"unique_to_{country2_code}": unique_country2,
         }
+
