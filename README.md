@@ -11,8 +11,6 @@ This application is designed to help users:
 - keep local holiday guides for offline viewing
 - support future cultural-awareness insights tied to public holidays
 
-The project currently includes a data-persistence layer for favourites and saved holiday guides, plus tests covering the core functionality.
-
 ## Features
 
 - Favourite country management
@@ -97,27 +95,3 @@ The following files are used to persist user preferences and saved guides:
 - `data/saved_guides.json`
 
 These files are created automatically when the app or storage manager is used.
-
-## Notes
-
-The project is structured around a modular design, with functionality split into separate Python modules for:
-
-- holiday data retrieval
-- guide generation
-- validation
-- date handling
-- comparisons
-- saved favourites
-
-## Future Improvements
-
-Potential extensions include:
-
-- a full UI for searching countries and holidays
-- AI-generated cultural explanations
-- filtering by region, month, or holiday type
-- export and sharing of saved guides
-
-## License
-
-This project does not currently include a license file. If you plan to share or distribute it publicly, consider adding an appropriate license.
